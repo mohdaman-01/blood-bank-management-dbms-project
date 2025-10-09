@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .test { margin: 20px 0; padding: 15px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .loading { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        button { padding: 10px 20px; margin: 10px 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🩸 Blood Bank API Connection Test</h1>
+    <p>This page tests the connection to your Heroku backend API.</p>
+    
+    <button onclick="testHealth()">Test Health Endpoint</button>
+    <button onclick="testSystemInfo()">Test System Info</button>
+    <button onclick="testAuth()">Test Authentication</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_URL = 'https://blood-bank-4a5247a51f8b.herokuapp.com/api';
+        
+        function addResult(title, status, message, data = null) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test ${status}`;
+            div.innerHTML = `
+                <h3>${title}</h3>
+                <p><strong>Status:</strong> ${status.toUpperCase()}</p>
+                <p><strong>Message:</strong> ${message}</p>
+                ${data ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : ''}
+            `;
+            results.appendChild(div);
+        }
+
+        async function testHealth() {
+            addResult('Health Check', 'loading', 'Testing...');
+            try {
+                const response = await fetch(`${API_URL}/dashboard/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('Health Check', 'success', 'API is healthy!', data);
+                } else {
+                    addResult('Health Check', 'error', `HTTP ${response.status}`, data);
+                }
+            } catch (error) {
+                addResult('Health Check', 'error', error.message);
+            }
+        }
+
+        async function testSystemInfo() {
+            addResult('System Info', 'loading', 'Testing...');
+            try {
+                const response = await fetch(`${API_URL}/system/info`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('System Info', 'success', 'System info retrieved!', data);
+                } else {
+                    addResult('System Info', 'error', `HTTP ${response.status}`, data);
+                }
+            } catch (error) {
+                addResult('System Info', 'error', error.message);
+            }
+        }
+
+        async function testAuth() {
+            addResult('Authentication Test', 'loading', 'Testing signup...');
+            try {
+                const testEmail = `test${Date.now()}@example.com`;
+                const response = await fetch(`${API_URL}/auth/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: testEmail,
+                        password: 'test123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('Authentication Test', 'success', 'Signup successful!', {
+                        email: data.email,
+                        role: data.role,
+                        hasToken: !!data.token
+                    });
+                } else {
+                    addResult('Authentication Test', 'error', `Signup failed: ${data.message}`);
+                }
+            } catch (error) {
+                addResult('Authentication Test', 'error', error.message);
+            }
+        }
+
+        // Auto-run health check on page load
+        window.onload = () => {
+            testHealth();
+        };
+    </script>
+</body>
+</html>
