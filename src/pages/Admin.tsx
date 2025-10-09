@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Shield, CheckCircle, XCircle, Edit2, AlertTriangle, Activity, Users, Droplets } from "lucide-react";
+import { apiService } from "@/lib/api";
 
 interface BloodRequest {
-  id: string;
+  id: number;
   patientName: string;
   bloodGroup: string;
   unitsRequired: number;
@@ -15,63 +16,89 @@ interface BloodRequest {
 }
 
 interface BloodItem {
-  id: string;
+  id: number;
   bloodGroup: string;
   quantity: number;
   expiryDate: string;
 }
 
+interface Donor {
+  id: number;
+  name: string;
+  age: number;
+  gender: string;
+  bloodGroup: string;
+  contact: string;
+  lastDonation: string | null;
+}
+
 const Admin = () => {
   const [requests, setRequests] = useState<BloodRequest[]>([]);
   const [bloodStock, setBloodStock] = useState<BloodItem[]>([]);
-  const [editingStock, setEditingStock] = useState<string | null>(null);
+  const [donors, setDonors] = useState<Donor[]>([]);
+  const [editingStock, setEditingStock] = useState<number | null>(null);
   const [editQuantity, setEditQuantity] = useState<string>("");
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = () => {
-    const savedRequests = localStorage.getItem("requests");
-    const savedStock = localStorage.getItem("bloodStock");
-    
-    if (savedRequests) setRequests(JSON.parse(savedRequests));
-    if (savedStock) setBloodStock(JSON.parse(savedStock));
+  const loadData = async () => {
+    try {
+      const [requestsData, stockData, donorsData] = await Promise.all([
+        apiService.getAllRequests(),
+        apiService.getAllStock(),
+        apiService.getAllDonors(),
+      ]);
+      
+      setRequests(requestsData);
+      setBloodStock(stockData);
+      setDonors(donorsData);
+    } catch (error) {
+      console.error("Failed to load data:", error);
+      toast.error("Failed to load data");
+    }
   };
 
-  const handleApprove = (id: string) => {
-    const updatedRequests = requests.map((req) =>
-      req.id === id ? { ...req, status: "Approved" } : req
-    );
-    setRequests(updatedRequests);
-    localStorage.setItem("requests", JSON.stringify(updatedRequests));
-    toast.success("Request approved successfully");
+  const handleApprove = async (id: number) => {
+    try {
+      await apiService.updateRequestStatus(id, "APPROVED");
+      toast.success("Request approved successfully");
+      await loadData();
+    } catch (error) {
+      console.error("Failed to approve request:", error);
+      toast.error("Failed to approve request");
+    }
   };
 
-  const handleReject = (id: string) => {
-    const updatedRequests = requests.map((req) =>
-      req.id === id ? { ...req, status: "Rejected" } : req
-    );
-    setRequests(updatedRequests);
-    localStorage.setItem("requests", JSON.stringify(updatedRequests));
-    toast.error("Request rejected");
+  const handleReject = async (id: number) => {
+    try {
+      await apiService.updateRequestStatus(id, "REJECTED");
+      toast.error("Request rejected");
+      await loadData();
+    } catch (error) {
+      console.error("Failed to reject request:", error);
+      toast.error("Failed to reject request");
+    }
   };
 
-  const handleUpdateStock = (id: string) => {
+  const handleUpdateStock = async (id: number) => {
     const quantity = parseInt(editQuantity);
     if (isNaN(quantity) || quantity < 0) {
       toast.error("Please enter a valid quantity");
       return;
     }
 
-    const updatedStock = bloodStock.map((item) =>
-      item.id === id ? { ...item, quantity } : item
-    );
-    setBloodStock(updatedStock);
-    localStorage.setItem("bloodStock", JSON.stringify(updatedStock));
-    setEditingStock(null);
-    setEditQuantity("");
-    toast.success("Stock updated successfully");
+    try {
+      await apiService.updateStockQuantity(id, quantity);
+      toast.success("Stock updated successfully");
+      setEditingStock(null);
+      setEditQuantity("");
+      await loadData();
+    } catch (error) {
+      console.error("Failed to update stock:", error);
+      toast.error("Failed to update stock");
+    }
   };
 
   const getDaysUntilExpiry = (expiryDate: string) => {
@@ -86,9 +113,8 @@ const Admin = () => {
     return days <= 7 && days >= 0;
   });
 
-  const pendingRequests = requests.filter((req) => req.status === "Pending");
+  const pendingRequests = requests.filter((req) => req.status === "PENDING");
   const totalStock = bloodStock.reduce((sum, item) => sum + item.quantity, 0);
-  const donors = JSON.parse(localStorage.getItem("donors") || "[]");
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -198,7 +224,7 @@ const Admin = () => {
                 ) : (
                   pendingRequests.map((request) => (
                     <tr key={request.id} className="hover:bg-muted/50">
-                      <td className="font-mono text-xs">{request.id.slice(-6)}</td>
+                      <td className="font-mono text-xs">#{request.id}</td>
                       <td className="font-medium">{request.patientName}</td>
                       <td>
                         <span className="inline-flex items-center justify-center px-2 py-1 rounded-md bg-primary/10 text-primary font-semibold text-xs">
@@ -315,6 +341,67 @@ const Admin = () => {
                     </td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Registered Donors */}
+      <Card className="transition-all duration-300 hover:shadow-lg animate-slide-in-left" style={{ boxShadow: 'var(--shadow-sm)', animationDelay: '300ms' }}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-primary/10 transition-transform duration-300 hover:scale-110">
+              <Users className="h-5 w-5 text-primary" />
+            </div>
+            Registered Donors ({donors.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Blood Group</th>
+                  <th>Age</th>
+                  <th>Gender</th>
+                  <th>Contact</th>
+                  <th>Last Donation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {donors.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="text-center text-muted-foreground py-8">
+                      No donors registered yet
+                    </td>
+                  </tr>
+                ) : (
+                  donors.map((donor, index) => (
+                    <tr 
+                      key={donor.id} 
+                      className="hover:bg-muted/50 transition-all duration-200 hover:shadow-sm"
+                      style={{ 
+                        animation: 'fade-in 0.3s ease-out forwards',
+                        animationDelay: `${index * 50}ms`
+                      }}
+                    >
+                      <td className="font-mono text-xs">#{donor.id}</td>
+                      <td className="font-medium">{donor.name}</td>
+                      <td>
+                        <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-semibold text-xs transition-all duration-300 hover:bg-primary/20 hover:scale-105">
+                          {donor.bloodGroup}
+                        </span>
+                      </td>
+                      <td>{donor.age}</td>
+                      <td>{donor.gender}</td>
+                      <td>{donor.contact}</td>
+                      <td>{donor.lastDonation ? new Date(donor.lastDonation).toLocaleDateString() : "N/A"}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

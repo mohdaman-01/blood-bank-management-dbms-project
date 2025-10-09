@@ -6,19 +6,21 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { UserPlus, Users } from "lucide-react";
+import { apiService } from "@/lib/api";
 
 interface Donor {
-  id: string;
+  id: number;
   name: string;
   age: number;
   gender: string;
   bloodGroup: string;
   contact: string;
-  lastDonation: string;
+  lastDonation: string | null;
 }
 
 const Donor = () => {
   const [donors, setDonors] = useState<Donor[]>([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -29,13 +31,20 @@ const Donor = () => {
   });
 
   useEffect(() => {
-    const savedDonors = localStorage.getItem("donors");
-    if (savedDonors) {
-      setDonors(JSON.parse(savedDonors));
-    }
+    loadDonors();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const loadDonors = async () => {
+    try {
+      const data = await apiService.getAllDonors();
+      setDonors(data);
+    } catch (error) {
+      console.error("Failed to load donors:", error);
+      toast.error("Failed to load donors");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.age || !formData.gender || !formData.bloodGroup || !formData.contact) {
@@ -43,29 +52,38 @@ const Donor = () => {
       return;
     }
 
-    const newDonor: Donor = {
-      id: Date.now().toString(),
-      name: formData.name,
-      age: parseInt(formData.age),
-      gender: formData.gender,
-      bloodGroup: formData.bloodGroup,
-      contact: formData.contact,
-      lastDonation: formData.lastDonation,
-    };
+    setLoading(true);
+    try {
+      const donorData = {
+        name: formData.name,
+        age: parseInt(formData.age),
+        gender: formData.gender,
+        bloodGroup: formData.bloodGroup,
+        contact: formData.contact,
+        lastDonation: formData.lastDonation || null,
+      };
 
-    const updatedDonors = [...donors, newDonor];
-    setDonors(updatedDonors);
-    localStorage.setItem("donors", JSON.stringify(updatedDonors));
-
-    toast.success("Donor registered successfully!");
-    setFormData({
-      name: "",
-      age: "",
-      gender: "",
-      bloodGroup: "",
-      contact: "",
-      lastDonation: "",
-    });
+      await apiService.createDonor(donorData);
+      toast.success("Donor registered successfully!");
+      
+      // Reload donors list
+      await loadDonors();
+      
+      // Reset form
+      setFormData({
+        name: "",
+        age: "",
+        gender: "",
+        bloodGroup: "",
+        contact: "",
+        lastDonation: "",
+      });
+    } catch (error) {
+      console.error("Failed to register donor:", error);
+      toast.error("Failed to register donor. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -166,9 +184,14 @@ const Donor = () => {
               </div>
             </div>
 
-            <Button type="submit" className="w-full md:w-auto transition-all duration-300 hover:scale-105 hover:shadow-lg" style={{ boxShadow: 'var(--shadow-primary)' }}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full md:w-auto transition-all duration-300 hover:scale-105 hover:shadow-lg" 
+              style={{ boxShadow: 'var(--shadow-primary)' }}
+            >
               <UserPlus className="mr-2 h-4 w-4" />
-              Add Donor
+              {loading ? "Registering..." : "Add Donor"}
             </Button>
           </form>
         </CardContent>
@@ -222,7 +245,7 @@ const Donor = () => {
                       <td>{donor.age}</td>
                       <td>{donor.gender}</td>
                       <td>{donor.contact}</td>
-                      <td>{donor.lastDonation || "N/A"}</td>
+                      <td>{donor.lastDonation ? new Date(donor.lastDonation).toLocaleDateString() : "N/A"}</td>
                     </tr>
                   ))
                 )}
