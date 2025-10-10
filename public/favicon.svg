@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bloodGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <path d="M50 10 C35 25, 20 40, 20 60 C20 75, 32.5 90, 50 90 C67.5 90, 80 75, 80 60 C80 40, 65 25, 50 10 Z" 
+        fill="url(#bloodGradient)" 
+        stroke="#991b1b" 
+        stroke-width="2"/>
+  <ellipse cx="40" cy="45" rx="8" ry="12" fill="#fca5a5" opacity="0.4"/>
+</svg>

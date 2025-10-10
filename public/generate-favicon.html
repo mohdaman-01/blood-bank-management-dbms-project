@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Blood Drop Favicon</title>
+</head>
+<body>
+    <h2>Blood Drop Favicon Generator</h2>
+    <canvas id="canvas" width="64" height="64" style="border: 1px solid #ccc;"></canvas>
+    <br><br>
+    <button onclick="downloadICO()">Download as ICO</button>
+    <button onclick="downloadPNG()">Download as PNG</button>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, 64, 64);
+        
+        // Create blood drop shape
+        ctx.beginPath();
+        
+        // Blood drop path
+        const centerX = 32;
+        const centerY = 32;
+        
+        // Draw blood drop
+        ctx.moveTo(centerX, 8);
+        ctx.bezierCurveTo(20, 18, 12, 28, 12, 40);
+        ctx.bezierCurveTo(12, 50, 20, 58, 32, 58);
+        ctx.bezierCurveTo(44, 58, 52, 50, 52, 40);
+        ctx.bezierCurveTo(52, 28, 44, 18, 32, 8);
+        ctx.closePath();
+        
+        // Create gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, 64);
+        gradient.addColorStop(0, '#ef4444');
+        gradient.addColorStop(1, '#dc2626');
+        
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        
+        // Add stroke
+        ctx.strokeStyle = '#991b1b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Add highlight
+        ctx.beginPath();
+        ctx.ellipse(26, 24, 6, 8, 0, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(252, 165, 165, 0.4)';
+        ctx.fill();
+        
+        function downloadPNG() {
+            const link = document.createElement('a');
+            link.download = 'favicon.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        function downloadICO() {
+            // For ICO, we'll download as PNG and user can convert
+            alert('Download the PNG and use an online converter like https://convertio.co/png-ico/ to create favicon.ico');
+            downloadPNG();
+        }
+    </script>
+</body>
+</html>

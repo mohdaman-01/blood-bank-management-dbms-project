@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Drop Favicon Preview</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #dc2626;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .preview-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+        .preview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.2);
+            border-color: #dc2626;
+        }
+        .preview-card h3 {
+            color: #dc2626;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .icon-display {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .icon-display img {
+            display: block;
+        }
+        .size-label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .info-box {
+            background: #fef2f2;
+            border-left: 4px solid #dc2626;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .info-box h3 {
+            color: #dc2626;
+            margin-top: 0;
+        }
+        .info-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .info-box li {
+            margin: 8px 0;
+            color: #666;
+        }
+        .color-swatch {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            margin: 0 5px;
+            vertical-align: middle;
+            border: 2px solid #ddd;
+        }
+        .browser-preview {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .browser-tab {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .browser-tab img {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🩸 Blood Drop Favicon Preview</h1>
+        <p class="subtitle">Blood Bank Management System - Icon Variations</p>
+
+        <div class="info-box">
+            <h3>✨ Design Features</h3>
+            <ul>
+                <li><strong>Color Gradient:</strong> 
+                    <span class="color-swatch" style="background: #ef4444;"></span>
+                    #ef4444 → 
+                    <span class="color-swatch" style="background: #dc2626;"></span>
+                    #dc2626
+                </li>
+                <li><strong>Border Color:</strong> 
+                    <span class="color-swatch" style="background: #991b1b;"></span>
+                    #991b1b (Dark Red)
+                </li>
+                <li><strong>Highlight:</strong> 
+                    <span class="color-swatch" style="background: #fca5a5;"></span>
+                    #fca5a5 (Light Red, 50% opacity)
+                </li>
+                <li><strong>Shape:</strong> Classic blood drop teardrop with 3D effect</li>
+            </ul>
+        </div>
+
+        <div class="preview-grid">
+            <div class="preview-card">
+                <h3>Main Favicon (SVG)</h3>
+                <div class="icon-display">
+                    <img src="/favicon.svg" width="64" height="64" alt="Main Favicon">
+                </div>
+                <div class="size-label">Scalable Vector (64x64 preview)</div>
+                <p style="color: #666; font-size: 14px; margin-top: 15px;">
+                    Used by modern browsers. Scales perfectly to any size.
+                </p>
+            </div>
+
+            <div class="preview-card">
+                <h3>32x32 Favicon</h3>
+                <div class="icon-display">
+                    <img src="/favicon-32x32.svg" width="32" height="32" alt="32x32 Favicon">
+                </div>
+                <div class="size-label">32 × 32 pixels</div>
+                <p style="color: #666; font-size: 14px; margin-top: 15px;">
+                    Standard size for browser tabs and bookmarks.
+                </p>
+            </div>
+
+            <div class="preview-card">
+                <h3>16x16 Favicon</h3>
+                <div class="icon-display">
+                    <img src="/favicon-16x16.svg" width="16" height="16" alt="16x16 Favicon">
+                </div>
+                <div class="size-label">16 × 16 pixels</div>
+                <p style="color: #666; font-size: 14px; margin-top: 15px;">
+                    Simplified version for small displays and browser UI.
+                </p>
+            </div>
+
+            <div class="preview-card">
+                <h3>Alternative Icon</h3>
+                <div class="icon-display">
+                    <img src="/blood-icon.svg" width="48" height="48" alt="Blood Icon">
+                </div>
+                <div class="size-label">48 × 48 pixels</div>
+                <p style="color: #666; font-size: 14px; margin-top: 15px;">
+                    Can be used for app icons or other purposes.
+                </p>
+            </div>
+        </div>
+
+        <div class="info-box" style="background: #eff6ff; border-left-color: #3b82f6;">
+            <h3 style="color: #3b82f6;">🌐 Browser Tab Preview</h3>
+            <div class="browser-preview">
+                <div class="browser-tab">
+                    <img src="/favicon-16x16.svg" alt="favicon">
+                    <span style="color: #333; font-size: 14px;">Blood Bank Management System</span>
+                </div>
+            </div>
+            <p style="color: #666; margin-top: 15px; font-size: 14px;">
+                This is how the favicon will appear in your browser tab.
+            </p>
+        </div>
+
+        <div class="info-box" style="background: #f0fdf4; border-left-color: #22c55e;">
+            <h3 style="color: #22c55e;">✅ Browser Support</h3>
+            <ul>
+                <li>✅ Chrome, Edge, Opera - Full SVG support</li>
+                <li>✅ Firefox - Full SVG support</li>
+                <li>✅ Safari (Desktop & iOS) - Full SVG support</li>
+                <li>✅ Mobile browsers - Responsive scaling</li>
+                <li>✅ High-DPI displays - Perfect quality</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
+            <p style="color: #666;">
+                <strong>Note:</strong> If you don't see the new favicon in your browser, 
+                try clearing your cache or doing a hard refresh (Ctrl+Shift+R or Cmd+Shift+R).
+            </p>
+        </div>
+    </div>
+</body>
+</html>
