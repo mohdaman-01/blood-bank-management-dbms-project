@@ -102,16 +102,20 @@ const Home = () => {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="text-center space-y-3 animate-scale-in">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
+      <div className="text-center space-y-4 animate-scale-in">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-primary via-destructive to-primary bg-clip-text text-transparent leading-tight">
           Blood Bank Management System
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
           Efficiently manage donors and blood inventory with modern technology
         </p>
         {user && (
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium">
-            Welcome, {user.email} ({user.role === 'ADMIN' ? 'Administrator' : 'User'})
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/10 to-destructive/10 border border-primary/20 text-primary rounded-xl text-sm font-medium shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            Welcome, <span className="font-semibold">{user.email}</span> 
+            <span className="px-2 py-0.5 bg-primary/20 rounded-md text-xs">
+              {user.role === 'ADMIN' ? 'Admin' : 'User'}
+            </span>
           </div>
         )}
       </div>

@@ -60,58 +60,62 @@ const BloodStock = () => {
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="animate-scale-in">
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-success bg-clip-text text-transparent mb-2">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-destructive to-success bg-clip-text text-transparent mb-2">
           Blood Stock Management
         </h1>
-        <p className="text-muted-foreground text-lg">Monitor available blood inventory and expiry dates</p>
+        <p className="text-muted-foreground text-base md:text-lg">Monitor available blood inventory and expiry dates</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="stat-card">
+        <Card className="stat-card group cursor-pointer border-success/20 animate-scale-in" style={{ animationDelay: '100ms' }}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-success transition-colors duration-300">
               Total Available Units
             </CardTitle>
-            <div className="p-2 rounded-lg bg-success/10">
-              <Droplets className="h-5 w-5 text-success" />
+            <div className="p-3 rounded-xl bg-success/10 transition-all duration-300 group-hover:scale-110 group-hover:bg-success/20 relative shadow-lg">
+              <Droplets className="h-6 w-6 text-success" />
+              <div className="absolute inset-0 rounded-xl bg-success/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">{totalUnits}</div>
+            <div className="text-4xl font-bold text-success transition-transform duration-300 group-hover:scale-110">{totalUnits}</div>
+            <p className="text-xs text-muted-foreground mt-2">Units in stock</p>
           </CardContent>
         </Card>
 
-        <Card className="stat-card">
+        <Card className="stat-card group cursor-pointer border-destructive/20 animate-scale-in" style={{ animationDelay: '200ms' }}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-destructive transition-colors duration-300">
               Units Expiring Soon
             </CardTitle>
-            <div className="p-2 rounded-lg bg-destructive/10">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
+            <div className="p-3 rounded-xl bg-destructive/10 transition-all duration-300 group-hover:scale-110 group-hover:bg-destructive/20 relative shadow-lg animate-pulse">
+              <AlertTriangle className="h-6 w-6 text-destructive" />
+              <div className="absolute inset-0 rounded-xl bg-destructive/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-destructive">{expiringUnits}</div>
+            <div className="text-4xl font-bold text-destructive transition-transform duration-300 group-hover:scale-110">{expiringUnits}</div>
+            <p className="text-xs text-muted-foreground mt-2">Requires attention</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="transition-all duration-300 hover:shadow-lg animate-slide-in-left" style={{ boxShadow: 'var(--shadow-sm)', animationDelay: '200ms' }}>
-        <CardHeader>
+      <Card className="transition-all duration-300 hover:shadow-xl animate-slide-in-left border-primary/10" style={{ animationDelay: '300ms' }}>
+        <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <CardTitle className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-primary/10 transition-transform duration-300 hover:scale-110">
-                <Droplets className="h-5 w-5 text-primary" />
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-destructive/20 transition-transform duration-300 hover:scale-110 hover:rotate-6 shadow-lg">
+                <Droplets className="h-6 w-6 text-primary" />
               </div>
-              Blood Inventory
+              <span className="text-xl">Blood Inventory</span>
             </CardTitle>
-            <div className="relative w-full md:w-64 group">
+            <div className="relative w-full md:w-72 group">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors duration-300 group-focus-within:text-primary" />
               <Input
                 placeholder="Search blood group..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+                className="pl-10 h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:border-primary"
               />
             </div>
           </div>

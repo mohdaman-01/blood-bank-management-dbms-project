@@ -89,19 +89,19 @@ const Donor = () => {
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="animate-scale-in">
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-destructive to-primary bg-clip-text text-transparent mb-2">
           Donor Management
         </h1>
-        <p className="text-muted-foreground text-lg">Register new donors and view donor list</p>
+        <p className="text-muted-foreground text-base md:text-lg">Register new donors and view donor list</p>
       </div>
 
-      <Card className="transition-all duration-300 hover:shadow-lg" style={{ boxShadow: 'var(--shadow-sm)' }}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-primary/10 transition-transform duration-300 hover:scale-110">
-              <UserPlus className="h-5 w-5 text-primary" />
+      <Card className="transition-all duration-300 hover:shadow-xl border-primary/10 animate-slide-in-left" style={{ animationDelay: '100ms' }}>
+        <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
+          <CardTitle className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-destructive/20 transition-transform duration-300 hover:scale-110 hover:rotate-6 shadow-lg">
+              <UserPlus className="h-6 w-6 text-primary" />
             </div>
-            Donor Registration Form
+            <span className="text-xl">Donor Registration Form</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -187,23 +187,36 @@ const Donor = () => {
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full md:w-auto transition-all duration-300 hover:scale-105 hover:shadow-lg" 
-              style={{ boxShadow: 'var(--shadow-primary)' }}
+              className="w-full md:w-auto transition-all duration-300 hover:scale-105 hover:shadow-xl bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90 shadow-lg" 
             >
-              <UserPlus className="mr-2 h-4 w-4" />
-              {loading ? "Registering..." : "Add Donor"}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Registering...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Add Donor
+                </>
+              )}
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      <Card className="transition-all duration-300 hover:shadow-lg animate-slide-in-left" style={{ boxShadow: 'var(--shadow-sm)', animationDelay: '200ms' }}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-primary/10 transition-transform duration-300 hover:scale-110">
-              <Users className="h-5 w-5 text-primary" />
+      <Card className="transition-all duration-300 hover:shadow-xl animate-slide-in-left border-primary/10" style={{ animationDelay: '200ms' }}>
+        <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
+          <CardTitle className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-destructive/20 transition-transform duration-300 hover:scale-110 hover:rotate-6 shadow-lg">
+              <Users className="h-6 w-6 text-primary" />
             </div>
-            Registered Donors ({donors.length})
+            <div>
+              <span className="text-xl">Registered Donors</span>
+              <span className="ml-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-semibold">
+                {donors.length}
+              </span>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>

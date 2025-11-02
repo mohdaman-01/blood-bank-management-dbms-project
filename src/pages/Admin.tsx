@@ -194,11 +194,20 @@ const Admin = () => {
       </div>
 
       {/* Pending Requests */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-primary" />
-            Pending Blood Requests ({pendingRequests.length})
+      <Card className="transition-all duration-300 hover:shadow-xl border-warning/20 animate-slide-in-left" style={{ animationDelay: '500ms' }}>
+        <CardHeader className="border-b bg-gradient-to-r from-warning/5 to-transparent">
+          <CardTitle className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-warning/20 to-warning/10 transition-transform duration-300 hover:scale-110 hover:rotate-6 shadow-lg">
+              <Activity className="h-6 w-6 text-warning" />
+            </div>
+            <div>
+              <span className="text-xl">Pending Blood Requests</span>
+              {pendingRequests.length > 0 && (
+                <span className="ml-2 px-3 py-1 bg-warning/10 text-warning rounded-full text-sm font-semibold animate-pulse">
+                  {pendingRequests.length}
+                </span>
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -238,7 +247,7 @@ const Admin = () => {
                           <Button
                             size="sm"
                             onClick={() => handleApprove(request.id)}
-                            className="bg-success hover:bg-success/90 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                            className="bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70 transition-all duration-300 hover:scale-105 hover:shadow-lg shadow-success/20"
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
                             Approve
@@ -247,7 +256,7 @@ const Admin = () => {
                             size="sm"
                             variant="destructive"
                             onClick={() => handleReject(request.id)}
-                            className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                            className="transition-all duration-300 hover:scale-105 hover:shadow-lg shadow-destructive/20"
                           >
                             <XCircle className="h-4 w-4 mr-1" />
                             Reject
@@ -264,11 +273,13 @@ const Admin = () => {
       </Card>
 
       {/* Stock Management */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Droplets className="h-5 w-5 text-primary" />
-            Stock Management
+      <Card className="transition-all duration-300 hover:shadow-xl border-primary/20 animate-slide-in-left" style={{ animationDelay: '600ms' }}>
+        <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
+          <CardTitle className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-destructive/20 transition-transform duration-300 hover:scale-110 hover:rotate-6 shadow-lg">
+              <Droplets className="h-6 w-6 text-primary" />
+            </div>
+            <span className="text-xl">Stock Management</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -310,7 +321,7 @@ const Admin = () => {
                           <Button
                             size="sm"
                             onClick={() => handleUpdateStock(item.id)}
-                            className="bg-success hover:bg-success/90"
+                            className="bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70 transition-all duration-300 hover:scale-105 shadow-success/20"
                           >
                             Save
                           </Button>
@@ -321,6 +332,7 @@ const Admin = () => {
                               setEditingStock(null);
                               setEditQuantity("");
                             }}
+                            className="transition-all duration-300 hover:scale-105"
                           >
                             Cancel
                           </Button>
@@ -333,6 +345,7 @@ const Admin = () => {
                             setEditingStock(item.id);
                             setEditQuantity(item.quantity.toString());
                           }}
+                          className="transition-all duration-300 hover:scale-105 hover:bg-primary/10 hover:text-primary hover:border-primary/50"
                         >
                           <Edit2 className="h-4 w-4 mr-1" />
                           Edit
