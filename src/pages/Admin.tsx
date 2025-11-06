@@ -3,7 +3,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Shield, CheckCircle, XCircle, Edit2, AlertTriangle, Activity, Users, Droplets } from "lucide-react";
+import { 
+  Shield, 
+  CheckCircle2, 
+  XCircle, 
+  Edit2, 
+  AlertTriangle, 
+  Activity, 
+  Users, 
+  Droplets,
+  User,
+  Phone,
+  Calendar,
+  Package,
+  TrendingUp,
+  Clock,
+  Save,
+  X
+} from "lucide-react";
 import { apiService } from "@/lib/api";
 
 interface BloodRequest {
@@ -117,76 +134,89 @@ const Admin = () => {
   const totalStock = bloodStock.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="animate-scale-in">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 transition-transform duration-300 hover:scale-110">
-            <Shield className="h-8 w-8 text-primary" />
-          </div>
-          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="flex items-center gap-4">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-info flex items-center justify-center shadow-lg shadow-primary/20">
+          <Shield className="w-8 h-8 text-white" />
+        </div>
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
             Admin Control Panel
-          </span>
-        </h1>
-        <p className="text-muted-foreground text-lg">Manage requests, stock, and monitor system status</p>
+          </h1>
+          <p className="text-muted-foreground">Manage system operations and monitor activities</p>
+        </div>
       </div>
 
-      {/* Dashboard Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="stat-card group cursor-pointer animate-scale-in" style={{ animationDelay: '100ms' }}>
+      {/* Dashboard Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="border-border/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground group-hover:text-warning transition-colors duration-300">Pending Requests</p>
-                <p className="text-3xl font-bold text-warning transition-transform duration-300 group-hover:scale-110">{pendingRequests.length}</p>
+                <p className="text-sm text-muted-foreground mb-1">Pending Requests</p>
+                <p className="text-4xl font-bold text-warning">{pendingRequests.length}</p>
+                <div className="flex items-center gap-1 mt-2 text-warning">
+                  <Clock className="w-4 h-4" />
+                  <span className="text-xs font-medium">Awaiting action</span>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-warning/10 transition-all duration-300 group-hover:scale-110 relative">
-                <Activity className="h-8 w-8 text-warning" />
-                <div className="absolute inset-0 rounded-xl bg-warning/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-warning/20 to-warning/10 flex items-center justify-center border border-warning/20">
+                <Activity className="w-7 h-7 text-warning" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="stat-card group cursor-pointer animate-scale-in" style={{ animationDelay: '200ms' }}>
+        <Card className="border-border/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground group-hover:text-primary transition-colors duration-300">Total Donors</p>
-                <p className="text-3xl font-bold text-primary transition-transform duration-300 group-hover:scale-110">{donors.length}</p>
+                <p className="text-sm text-muted-foreground mb-1">Total Donors</p>
+                <p className="text-4xl font-bold text-primary">{donors.length}</p>
+                <div className="flex items-center gap-1 mt-2 text-primary">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-xs font-medium">Registered</span>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-primary/10 transition-all duration-300 group-hover:scale-110 relative">
-                <Users className="h-8 w-8 text-primary" />
-                <div className="absolute inset-0 rounded-xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-info/20 flex items-center justify-center border border-primary/20">
+                <Users className="w-7 h-7 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="stat-card group cursor-pointer animate-scale-in" style={{ animationDelay: '300ms' }}>
+        <Card className="border-border/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground group-hover:text-success transition-colors duration-300">Total Stock</p>
-                <p className="text-3xl font-bold text-success transition-transform duration-300 group-hover:scale-110">{totalStock}</p>
+                <p className="text-sm text-muted-foreground mb-1">Total Stock</p>
+                <p className="text-4xl font-bold text-success">{totalStock}</p>
+                <div className="flex items-center gap-1 mt-2 text-success">
+                  <Package className="w-4 h-4" />
+                  <span className="text-xs font-medium">Units available</span>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-success/10 transition-all duration-300 group-hover:scale-110 relative">
-                <Droplets className="h-8 w-8 text-success" />
-                <div className="absolute inset-0 rounded-xl bg-success/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-success/20 to-success/10 flex items-center justify-center border border-success/20">
+                <Droplets className="w-7 h-7 text-success" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="stat-card group cursor-pointer animate-scale-in" style={{ animationDelay: '400ms' }}>
+        <Card className="border-destructive/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground group-hover:text-destructive transition-colors duration-300">Expiring Soon</p>
-                <p className="text-3xl font-bold text-destructive transition-transform duration-300 group-hover:scale-110">{expiringStock.length}</p>
+                <p className="text-sm text-muted-foreground mb-1">Expiring Soon</p>
+                <p className="text-4xl font-bold text-destructive">{expiringStock.length}</p>
+                <div className="flex items-center gap-1 mt-2 text-destructive">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="text-xs font-medium">Needs attention</span>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-destructive/10 transition-all duration-300 group-hover:scale-110 relative">
-                <AlertTriangle className="h-8 w-8 text-destructive" />
-                <div className="absolute inset-0 rounded-xl bg-destructive/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-destructive/20 to-destructive/10 flex items-center justify-center border border-destructive/20 animate-pulse">
+                <AlertTriangle className="w-7 h-7 text-destructive" />
               </div>
             </div>
           </CardContent>
@@ -194,71 +224,101 @@ const Admin = () => {
       </div>
 
       {/* Pending Requests */}
-      <Card className="transition-all duration-300 hover:shadow-xl border-warning/20 animate-slide-in-left" style={{ animationDelay: '500ms' }}>
-        <CardHeader className="border-b bg-gradient-to-r from-warning/5 to-transparent">
-          <CardTitle className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-warning/20 to-warning/10 transition-transform duration-300 hover:scale-110 hover:rotate-6 shadow-lg">
-              <Activity className="h-6 w-6 text-warning" />
+      <Card className="border-border/50 shadow-lg">
+        <CardHeader className="border-b bg-gradient-to-r from-warning/5 via-warning/3 to-transparent pb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-warning to-warning/80 flex items-center justify-center shadow-lg shadow-warning/20">
+                <Activity className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl">Pending Blood Requests</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {pendingRequests.length} requests awaiting approval
+                </p>
+              </div>
             </div>
-            <div>
-              <span className="text-xl">Pending Blood Requests</span>
-              {pendingRequests.length > 0 && (
-                <span className="ml-2 px-3 py-1 bg-warning/10 text-warning rounded-full text-sm font-semibold animate-pulse">
-                  {pendingRequests.length}
-                </span>
-              )}
-            </div>
-          </CardTitle>
+            {pendingRequests.length > 0 && (
+              <div className="px-4 py-2 rounded-xl bg-warning/10 border border-warning/20 animate-pulse">
+                <span className="text-sm font-semibold text-warning">{pendingRequests.length} Pending</span>
+              </div>
+            )}
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="data-table">
+            <table className="w-full">
               <thead>
-                <tr>
-                  <th>Request ID</th>
-                  <th>Patient Name</th>
-                  <th>Blood Group</th>
-                  <th>Units Required</th>
-                  <th>Hospital</th>
-                  <th>Actions</th>
+                <tr className="border-b border-border/50 bg-muted/30">
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Request ID</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Patient Name</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Blood Group</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Units</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Hospital</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {pendingRequests.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center text-muted-foreground py-8">
-                      No pending requests
+                    <td colSpan={6} className="text-center py-12">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
+                          <Activity className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">No pending requests</p>
+                          <p className="text-sm text-muted-foreground">All requests have been processed</p>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ) : (
-                  pendingRequests.map((request) => (
-                    <tr key={request.id} className="hover:bg-muted/50">
-                      <td className="font-mono text-xs">#{request.id}</td>
-                      <td className="font-medium">{request.patientName}</td>
-                      <td>
-                        <span className="inline-flex items-center justify-center px-2 py-1 rounded-md bg-primary/10 text-primary font-semibold text-xs">
+                  pendingRequests.map((request, index) => (
+                    <tr 
+                      key={request.id} 
+                      className="border-b border-border/30 hover:bg-muted/20 transition-colors duration-200"
+                      style={{ 
+                        animation: 'fade-in 0.3s ease-out forwards',
+                        animationDelay: `${index * 30}ms`,
+                        opacity: 0
+                      }}
+                    >
+                      <td className="py-4 px-6">
+                        <span className="font-mono text-sm text-muted-foreground">#{request.id}</span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="font-semibold text-foreground">{request.patientName}</span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-primary/10 to-info/10 border border-primary/20 font-bold text-primary">
+                          <Droplets className="w-4 h-4" fill="currentColor" />
                           {request.bloodGroup}
                         </span>
                       </td>
-                      <td>{request.unitsRequired}</td>
-                      <td>{request.hospitalName}</td>
-                      <td>
+                      <td className="py-4 px-6">
+                        <span className="font-semibold text-foreground">{request.unitsRequired}</span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="text-muted-foreground">{request.hospitalName}</span>
+                      </td>
+                      <td className="py-4 px-6">
                         <div className="flex gap-2">
                           <Button
                             size="sm"
                             onClick={() => handleApprove(request.id)}
-                            className="bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70 transition-all duration-300 hover:scale-105 hover:shadow-lg shadow-success/20"
+                            className="gap-2 bg-gradient-to-r from-success to-success/80 hover:shadow-lg hover:shadow-success/30"
                           >
-                            <CheckCircle className="h-4 w-4 mr-1" />
+                            <CheckCircle2 className="w-4 h-4" />
                             Approve
                           </Button>
                           <Button
                             size="sm"
                             variant="destructive"
                             onClick={() => handleReject(request.id)}
-                            className="transition-all duration-300 hover:scale-105 hover:shadow-lg shadow-destructive/20"
+                            className="gap-2 hover:shadow-lg hover:shadow-destructive/30"
                           >
-                            <XCircle className="h-4 w-4 mr-1" />
+                            <XCircle className="w-4 h-4" />
                             Reject
                           </Button>
                         </div>
@@ -273,56 +333,80 @@ const Admin = () => {
       </Card>
 
       {/* Stock Management */}
-      <Card className="transition-all duration-300 hover:shadow-xl border-primary/20 animate-slide-in-left" style={{ animationDelay: '600ms' }}>
-        <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
-          <CardTitle className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-destructive/20 transition-transform duration-300 hover:scale-110 hover:rotate-6 shadow-lg">
-              <Droplets className="h-6 w-6 text-primary" />
+      <Card className="border-border/50 shadow-lg">
+        <CardHeader className="border-b bg-gradient-to-r from-primary/5 via-info/5 to-transparent pb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-info flex items-center justify-center shadow-lg shadow-primary/20">
+              <Droplets className="w-7 h-7 text-white" />
             </div>
-            <span className="text-xl">Stock Management</span>
-          </CardTitle>
+            <div>
+              <CardTitle className="text-2xl">Stock Management</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">Update blood inventory quantities</p>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="data-table">
+            <table className="w-full">
               <thead>
-                <tr>
-                  <th>Blood Group</th>
-                  <th>Current Quantity</th>
-                  <th>Expiry Date</th>
-                  <th>Actions</th>
+                <tr className="border-b border-border/50 bg-muted/30">
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Blood Group</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Current Quantity</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Expiry Date</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {bloodStock.map((item) => (
-                  <tr key={item.id} className="hover:bg-muted/50">
-                    <td>
-                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-primary/10 text-primary font-bold">
-                        {item.bloodGroup}
-                      </span>
+                {bloodStock.map((item, index) => (
+                  <tr 
+                    key={item.id} 
+                    className="border-b border-border/30 hover:bg-muted/20 transition-colors duration-200"
+                    style={{ 
+                      animation: 'fade-in 0.3s ease-out forwards',
+                      animationDelay: `${index * 30}ms`,
+                      opacity: 0
+                    }}
+                  >
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-info/20 flex items-center justify-center border border-primary/20">
+                          <Droplets className="w-5 h-5 text-primary" fill="currentColor" />
+                        </div>
+                        <span className="text-lg font-bold text-primary">{item.bloodGroup}</span>
+                      </div>
                     </td>
-                    <td>
+                    <td className="py-4 px-6">
                       {editingStock === item.id ? (
                         <Input
                           type="number"
                           value={editQuantity}
                           onChange={(e) => setEditQuantity(e.target.value)}
-                          className="w-24"
+                          className="w-32 h-10"
                           min="0"
+                          autoFocus
                         />
                       ) : (
-                        <span className="font-semibold">{item.quantity} units</span>
+                        <div className="flex items-center gap-2">
+                          <Package className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-semibold text-foreground">{item.quantity} units</span>
+                        </div>
                       )}
                     </td>
-                    <td>{item.expiryDate}</td>
-                    <td>
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="w-4 h-4" />
+                        {item.expiryDate}
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
                       {editingStock === item.id ? (
                         <div className="flex gap-2">
                           <Button
                             size="sm"
                             onClick={() => handleUpdateStock(item.id)}
-                            className="bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70 transition-all duration-300 hover:scale-105 shadow-success/20"
+                            className="gap-2 bg-gradient-to-r from-success to-success/80"
                           >
+                            <Save className="w-4 h-4" />
                             Save
                           </Button>
                           <Button
@@ -332,8 +416,9 @@ const Admin = () => {
                               setEditingStock(null);
                               setEditQuantity("");
                             }}
-                            className="transition-all duration-300 hover:scale-105"
+                            className="gap-2"
                           >
+                            <X className="w-4 h-4" />
                             Cancel
                           </Button>
                         </div>
@@ -345,9 +430,9 @@ const Admin = () => {
                             setEditingStock(item.id);
                             setEditQuantity(item.quantity.toString());
                           }}
-                          className="transition-all duration-300 hover:scale-105 hover:bg-primary/10 hover:text-primary hover:border-primary/50"
+                          className="gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/50"
                         >
-                          <Edit2 className="h-4 w-4 mr-1" />
+                          <Edit2 className="w-4 h-4" />
                           Edit
                         </Button>
                       )}
@@ -360,96 +445,42 @@ const Admin = () => {
         </CardContent>
       </Card>
 
-      {/* Registered Donors */}
-      <Card className="transition-all duration-300 hover:shadow-lg animate-slide-in-left" style={{ boxShadow: 'var(--shadow-sm)', animationDelay: '300ms' }}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-primary/10 transition-transform duration-300 hover:scale-110">
-              <Users className="h-5 w-5 text-primary" />
-            </div>
-            Registered Donors ({donors.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Blood Group</th>
-                  <th>Age</th>
-                  <th>Gender</th>
-                  <th>Contact</th>
-                  <th>Last Donation</th>
-                </tr>
-              </thead>
-              <tbody>
-                {donors.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="text-center text-muted-foreground py-8">
-                      No donors registered yet
-                    </td>
-                  </tr>
-                ) : (
-                  donors.map((donor, index) => (
-                    <tr 
-                      key={donor.id} 
-                      className="hover:bg-muted/50 transition-all duration-200 hover:shadow-sm"
-                      style={{ 
-                        animation: 'fade-in 0.3s ease-out forwards',
-                        animationDelay: `${index * 50}ms`
-                      }}
-                    >
-                      <td className="font-mono text-xs">#{donor.id}</td>
-                      <td className="font-medium">{donor.name}</td>
-                      <td>
-                        <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-semibold text-xs transition-all duration-300 hover:bg-primary/20 hover:scale-105">
-                          {donor.bloodGroup}
-                        </span>
-                      </td>
-                      <td>{donor.age}</td>
-                      <td>{donor.gender}</td>
-                      <td>{donor.contact}</td>
-                      <td>{donor.lastDonation ? new Date(donor.lastDonation).toLocaleDateString() : "N/A"}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Expiry Alerts */}
-      <Card className="border-destructive/50 transition-all duration-300 hover:shadow-lg animate-slide-in-left" style={{ boxShadow: 'var(--shadow-sm)', animationDelay: '400ms' }}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-destructive">
-            <div className="p-2 rounded-lg bg-destructive/10 transition-transform duration-300 hover:scale-110 animate-pulse">
-              <AlertTriangle className="h-5 w-5" />
+      {expiringStock.length > 0 && (
+        <Card className="border-destructive/30 shadow-lg">
+          <CardHeader className="border-b bg-gradient-to-r from-destructive/5 to-transparent pb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-destructive to-destructive/80 flex items-center justify-center shadow-lg shadow-destructive/20 animate-pulse">
+                <AlertTriangle className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl text-destructive">Expiry Alerts</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {expiringStock.length} items expiring within 7 days
+                </p>
+              </div>
             </div>
-            Expiry Alerts - Units Expiring Within 7 Days
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {expiringStock.length === 0 ? (
-            <p className="text-center text-muted-foreground py-4">No expiring stock</p>
-          ) : (
+          </CardHeader>
+          <CardContent className="pt-6">
             <div className="space-y-3">
               {expiringStock.map((item, index) => {
                 const days = getDaysUntilExpiry(item.expiryDate);
                 return (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-4 bg-destructive/5 border border-destructive/20 rounded-lg transition-all duration-300 hover:bg-destructive/10 hover:border-destructive/30 hover:shadow-md hover:-translate-y-0.5 animate-fade-in"
-                    style={{ animationDelay: `${index * 100}ms` }}
+                    className="flex items-center justify-between p-4 rounded-xl bg-destructive/5 border border-destructive/20 hover:bg-destructive/10 transition-all duration-300"
+                    style={{ 
+                      animation: 'fade-in 0.3s ease-out forwards',
+                      animationDelay: `${index * 50}ms`,
+                      opacity: 0
+                    }}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-destructive/10 animate-pulse">
-                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center animate-pulse">
+                        <AlertTriangle className="w-6 h-6 text-destructive" />
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground transition-colors duration-300 hover:text-destructive">
+                        <p className="font-semibold text-foreground">
                           Blood Group {item.bloodGroup} - {item.quantity} units
                         </p>
                         <p className="text-sm text-muted-foreground">
@@ -457,13 +488,16 @@ const Admin = () => {
                         </p>
                       </div>
                     </div>
+                    <div className="px-4 py-2 rounded-lg bg-destructive/10 border border-destructive/20">
+                      <span className="text-sm font-semibold text-destructive">{days} days left</span>
+                    </div>
                   </div>
                 );
               })}
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

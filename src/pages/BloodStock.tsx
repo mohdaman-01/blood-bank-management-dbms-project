@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Droplets, Search, AlertTriangle } from "lucide-react";
+import { 
+  Droplets, 
+  Search, 
+  AlertTriangle, 
+  TrendingUp,
+  Calendar,
+  Package,
+  Filter,
+  Download,
+  RefreshCw
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface BloodItem {
   id: string;
@@ -13,13 +25,13 @@ interface BloodItem {
 const BloodStock = () => {
   const [bloodStock, setBloodStock] = useState<BloodItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   useEffect(() => {
     const savedStock = localStorage.getItem("bloodStock");
     if (savedStock) {
       setBloodStock(JSON.parse(savedStock));
     } else {
-      // Initialize with sample data
       const sampleData: BloodItem[] = [
         { id: "1", bloodGroup: "A+", quantity: 15, expiryDate: "2025-11-15" },
         { id: "2", bloodGroup: "A-", quantity: 8, expiryDate: "2025-10-20" },
@@ -39,144 +51,238 @@ const BloodStock = () => {
     const today = new Date();
     const expiry = new Date(expiryDate);
     const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const isExpiringSoon = (expiryDate: string) => {
+  const getStatus = (expiryDate: string) => {
     const days = getDaysUntilExpiry(expiryDate);
-    return days <= 2 && days >= 0;
+    if (days < 0) return "expired";
+    if (days <= 7) return "expiring";
+    return "available";
   };
 
-  const filteredStock = bloodStock.filter((item) =>
-    item.bloodGroup.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredStock = bloodStock.filter((item) => {
+    const matchesSearch = item.bloodGroup.toLowerCase().includes(searchTerm.toLowerCase());
+    const status = getStatus(item.expiryDate);
+    const matchesFilter = filterStatus === "all" || status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
 
   const totalUnits = bloodStock.reduce((sum, item) => sum + item.quantity, 0);
   const expiringUnits = bloodStock
-    .filter((item) => isExpiringSoon(item.expiryDate))
+    .filter((item) => getStatus(item.expiryDate) === "expiring")
     .reduce((sum, item) => sum + item.quantity, 0);
+  const availableTypes = bloodStock.filter(item => item.quantity > 0).length;
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="animate-scale-in">
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-destructive to-success bg-clip-text text-transparent mb-2">
-          Blood Stock Management
-        </h1>
-        <p className="text-muted-foreground text-base md:text-lg">Monitor available blood inventory and expiry dates</p>
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            Blood Stock Inventory
+          </h1>
+          <p className="text-muted-foreground">Monitor and manage blood stock levels</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" className="gap-2">
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </Button>
+          <Button className="gap-2 bg-gradient-to-r from-primary to-info">
+            <Download className="w-4 h-4" />
+            Export Report
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="stat-card group cursor-pointer border-success/20 animate-scale-in" style={{ animationDelay: '100ms' }}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-success transition-colors duration-300">
-              Total Available Units
-            </CardTitle>
-            <div className="p-3 rounded-xl bg-success/10 transition-all duration-300 group-hover:scale-110 group-hover:bg-success/20 relative shadow-lg">
-              <Droplets className="h-6 w-6 text-success" />
-              <div className="absolute inset-0 rounded-xl bg-success/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-success transition-transform duration-300 group-hover:scale-110">{totalUnits}</div>
-            <p className="text-xs text-muted-foreground mt-2">Units in stock</p>
-          </CardContent>
-        </Card>
-
-        <Card className="stat-card group cursor-pointer border-destructive/20 animate-scale-in" style={{ animationDelay: '200ms' }}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-destructive transition-colors duration-300">
-              Units Expiring Soon
-            </CardTitle>
-            <div className="p-3 rounded-xl bg-destructive/10 transition-all duration-300 group-hover:scale-110 group-hover:bg-destructive/20 relative shadow-lg animate-pulse">
-              <AlertTriangle className="h-6 w-6 text-destructive" />
-              <div className="absolute inset-0 rounded-xl bg-destructive/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-destructive transition-transform duration-300 group-hover:scale-110">{expiringUnits}</div>
-            <p className="text-xs text-muted-foreground mt-2">Requires attention</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="transition-all duration-300 hover:shadow-xl animate-slide-in-left border-primary/10" style={{ animationDelay: '300ms' }}>
-        <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <CardTitle className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-destructive/20 transition-transform duration-300 hover:scale-110 hover:rotate-6 shadow-lg">
-                <Droplets className="h-6 w-6 text-primary" />
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="border-border/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Total Units</p>
+                <p className="text-4xl font-bold text-foreground">{totalUnits}</p>
+                <div className="flex items-center gap-1 mt-2 text-success">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-xs font-medium">In stock</span>
+                </div>
               </div>
-              <span className="text-xl">Blood Inventory</span>
-            </CardTitle>
-            <div className="relative w-full md:w-72 group">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors duration-300 group-focus-within:text-primary" />
-              <Input
-                placeholder="Search blood group..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              />
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-info/20 flex items-center justify-center border border-primary/20">
+                <Package className="w-8 h-8 text-primary" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Blood Types</p>
+                <p className="text-4xl font-bold text-foreground">{availableTypes}</p>
+                <div className="flex items-center gap-1 mt-2 text-info">
+                  <Droplets className="w-4 h-4" />
+                  <span className="text-xs font-medium">Available</span>
+                </div>
+              </div>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-info/20 to-primary/20 flex items-center justify-center border border-info/20">
+                <Droplets className="w-8 h-8 text-info" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-destructive/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Expiring Soon</p>
+                <p className="text-4xl font-bold text-destructive">{expiringUnits}</p>
+                <div className="flex items-center gap-1 mt-2 text-destructive">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="text-xs font-medium">Needs attention</span>
+                </div>
+              </div>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-destructive/20 to-destructive/10 flex items-center justify-center border border-destructive/20 animate-pulse">
+                <AlertTriangle className="w-8 h-8 text-destructive" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Inventory Table */}
+      <Card className="border-border/50 shadow-lg">
+        <CardHeader className="border-b bg-gradient-to-r from-primary/5 via-info/5 to-transparent pb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-info flex items-center justify-center shadow-lg shadow-primary/20">
+                <Droplets className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl">Blood Inventory</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {filteredStock.length} of {bloodStock.length} items
+                </p>
+              </div>
+            </div>
+
+            {/* Search and Filter */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search blood group..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-11 w-full sm:w-64 border-border/50"
+                />
+              </div>
+
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="h-11 w-full sm:w-40 border-border/50">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="available">Available</SelectItem>
+                  <SelectItem value="expiring">Expiring Soon</SelectItem>
+                  <SelectItem value="expired">Expired</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="data-table">
+            <table className="w-full">
               <thead>
-                <tr>
-                  <th>Blood Group</th>
-                  <th>Quantity (Units)</th>
-                  <th>Expiry Date</th>
-                  <th>Days Until Expiry</th>
-                  <th>Status</th>
+                <tr className="border-b border-border/50 bg-muted/30">
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Blood Group</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Quantity</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Expiry Date</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Days Remaining</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredStock.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center text-muted-foreground py-8">
-                      No blood stock available
+                    <td colSpan={5} className="text-center py-12">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
+                          <Package className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">No stock found</p>
+                          <p className="text-sm text-muted-foreground">
+                            {searchTerm || filterStatus !== "all" 
+                              ? "Try adjusting your search or filters" 
+                              : "No blood stock available"}
+                          </p>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   filteredStock.map((item, index) => {
                     const daysUntilExpiry = getDaysUntilExpiry(item.expiryDate);
-                    const expiring = isExpiringSoon(item.expiryDate);
+                    const status = getStatus(item.expiryDate);
                     
                     return (
                       <tr 
                         key={item.id} 
-                        className={`hover:bg-muted/50 transition-all duration-200 hover:shadow-sm ${expiring ? "expiry-warning" : ""}`}
+                        className="border-b border-border/30 hover:bg-muted/20 transition-colors duration-200"
                         style={{ 
                           animation: 'fade-in 0.3s ease-out forwards',
-                          animationDelay: `${index * 50}ms`
+                          animationDelay: `${index * 30}ms`,
+                          opacity: 0
                         }}
                       >
-                        <td>
-                          <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-bold transition-all duration-300 hover:bg-primary/20 hover:scale-105">
-                            {item.bloodGroup}
-                          </span>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-info/20 flex items-center justify-center border border-primary/20">
+                              <Droplets className="w-6 h-6 text-primary" fill="currentColor" />
+                            </div>
+                            <span className="text-xl font-bold text-primary">{item.bloodGroup}</span>
+                          </div>
                         </td>
-                        <td className="font-semibold">{item.quantity}</td>
-                        <td>{item.expiryDate}</td>
-                        <td>
-                          <span className={`transition-colors duration-300 ${daysUntilExpiry <= 2 ? "font-semibold text-destructive" : ""}`}>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-2">
+                            <Package className="w-4 h-4 text-muted-foreground" />
+                            <span className="font-semibold text-foreground">{item.quantity} units</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Calendar className="w-4 h-4" />
+                            {item.expiryDate}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`font-semibold ${
+                            daysUntilExpiry <= 7 ? "text-destructive" : "text-foreground"
+                          }`}>
                             {daysUntilExpiry > 0 ? `${daysUntilExpiry} days` : "Expired"}
                           </span>
                         </td>
-                        <td>
-                          {expiring ? (
-                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive font-semibold text-xs transition-all duration-300 hover:bg-destructive/20 hover:scale-105 animate-pulse">
-                              <AlertTriangle className="h-3 w-3" />
-                              Expiring Soon
-                            </span>
-                          ) : daysUntilExpiry < 0 ? (
-                            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-destructive text-destructive-foreground font-semibold text-xs transition-all duration-300 hover:scale-105">
+                        <td className="py-4 px-6">
+                          {status === "expired" ? (
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-destructive text-destructive-foreground font-semibold text-xs">
+                              <AlertTriangle className="w-3 h-3" />
                               Expired
                             </span>
+                          ) : status === "expiring" ? (
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-warning/10 text-warning border border-warning/20 font-semibold text-xs animate-pulse">
+                              <AlertTriangle className="w-3 h-3" />
+                              Expiring Soon
+                            </span>
                           ) : (
-                            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-success/10 text-success font-semibold text-xs transition-all duration-300 hover:bg-success/20 hover:scale-105">
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-success/10 text-success border border-success/20 font-semibold text-xs">
+                              <TrendingUp className="w-3 h-3" />
                               Available
                             </span>
                           )}
