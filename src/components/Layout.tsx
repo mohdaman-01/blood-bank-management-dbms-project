@@ -12,7 +12,8 @@ import {
   Search,
   ChevronRight,
   AlertTriangle,
-  Calendar
+  Calendar,
+  Heart
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -86,6 +87,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     const baseItems = [
       { path: "/", label: "Dashboard", icon: Home, color: "text-primary" },
       { path: "/donor", label: "Donors", icon: Users, color: "text-info" },
+      { path: "/request-blood", label: "Request Blood", icon: Heart, color: "text-destructive" },
     ];
 
     if (user?.role === 'ADMIN') {

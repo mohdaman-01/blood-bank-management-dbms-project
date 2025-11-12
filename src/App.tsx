@@ -11,6 +11,7 @@ import BloodStock from "./pages/BloodStock";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import RequestBlood from "./pages/RequestBlood";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
             <Route path="/" element={<ProtectedRoute><Layout><Home /></Layout></ProtectedRoute>} />
             <Route path="/donor" element={<ProtectedRoute><Layout><Donor /></Layout></ProtectedRoute>} />
+            <Route path="/request-blood" element={<ProtectedRoute><Layout><RequestBlood /></Layout></ProtectedRoute>} />
             <Route path="/blood-stock" element={<ProtectedRoute adminOnly><Layout><BloodStock /></Layout></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><Layout><Admin /></Layout></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
