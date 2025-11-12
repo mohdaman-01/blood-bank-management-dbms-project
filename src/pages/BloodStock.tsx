@@ -31,18 +31,24 @@ const BloodStock = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [isDiscarding, setIsDiscarding] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadStock();
   }, []);
 
   const loadStock = async () => {
+    setIsLoading(true);
     try {
       const stockData = await apiService.getAllStock();
       setBloodStock(stockData);
     } catch (error) {
       console.error("Failed to load stock:", error);
-      toast.error("Failed to load blood stock");
+      toast.error("Failed to load blood stock. Please check your connection.");
+      // Set empty array on error
+      setBloodStock([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,10 +96,10 @@ const BloodStock = () => {
 
   const totalUnits = bloodStock.reduce((sum, item) => sum + item.quantity, 0);
   const expiringUnits = bloodStock
-    .filter((item) => getStatus(item.expiryDate) === "expiring")
+    .filter((item) => getExpiryStatus(item.expiryDate) === "expiring")
     .reduce((sum, item) => sum + item.quantity, 0);
   const expiredUnits = bloodStock
-    .filter((item) => getStatus(item.expiryDate) === "expired")
+    .filter((item) => getExpiryStatus(item.expiryDate) === "expired")
     .reduce((sum, item) => sum + item.quantity, 0);
   const availableTypes = bloodStock.filter(item => item.quantity > 0).length;
 
@@ -244,7 +250,19 @@ const BloodStock = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredStock.length === 0 ? (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={6} className="text-center py-12">
+                      <div className="flex flex-col items-center gap-3">
+                        <RefreshCw className="w-12 h-12 text-primary animate-spin" />
+                        <div>
+                          <p className="font-semibold text-foreground">Loading blood stock...</p>
+                          <p className="text-sm text-muted-foreground">Please wait</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredStock.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="text-center py-12">
                       <div className="flex flex-col items-center gap-3">
@@ -265,7 +283,7 @@ const BloodStock = () => {
                 ) : (
                   filteredStock.map((item, index) => {
                     const daysUntilExpiry = getDaysUntilExpiry(item.expiryDate);
-                    const status = getStatus(item.expiryDate);
+                    const status = getExpiryStatus(item.expiryDate);
                     
                     return (
                       <tr 
