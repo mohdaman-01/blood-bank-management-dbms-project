@@ -36,13 +36,19 @@ const RequestBlood = () => {
 
     setIsSubmitting(true);
     try {
-      await apiService.createRequest({
+      const requestData = {
         patientName: formData.patientName,
         age: parseInt(formData.age),
         bloodGroup: formData.bloodGroup,
         unitsRequired: parseInt(formData.unitsRequired),
         hospitalName: formData.hospitalName,
-      });
+      };
+      
+      console.log("Submitting request:", requestData);
+      
+      const response = await apiService.createRequest(requestData);
+      
+      console.log("Request submitted successfully:", response);
       
       toast.success("Blood request submitted successfully! Admin will review your request.");
       setFormData({
@@ -52,9 +58,24 @@ const RequestBlood = () => {
         unitsRequired: "",
         hospitalName: "",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit request:", error);
-      toast.error("Failed to submit request. Please try again.");
+      console.error("Error details:", {
+        message: error?.message,
+        status: error?.status,
+        response: error?.response
+      });
+      
+      // Show more specific error message
+      if (error?.message?.includes("401") || error?.message?.includes("Authentication")) {
+        toast.error("Authentication failed. Please login again.");
+      } else if (error?.message?.includes("403")) {
+        toast.error("You don't have permission to create requests.");
+      } else if (error?.message?.includes("400")) {
+        toast.error("Invalid request data. Please check all fields.");
+      } else {
+        toast.error("Failed to submit request. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

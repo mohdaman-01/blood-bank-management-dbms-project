@@ -10,13 +10,17 @@ import {
   Package,
   Filter,
   Download,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
+import { apiService } from "@/lib/api";
+import { getDaysUntilExpiry, getExpiryStatus } from "@/lib/date-utils";
 
 interface BloodItem {
-  id: string;
+  id: number;
   bloodGroup: string;
   quantity: number;
   expiryDate: string;
@@ -26,44 +30,60 @@ const BloodStock = () => {
   const [bloodStock, setBloodStock] = useState<BloodItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [isDiscarding, setIsDiscarding] = useState(false);
 
   useEffect(() => {
-    const savedStock = localStorage.getItem("bloodStock");
-    if (savedStock) {
-      setBloodStock(JSON.parse(savedStock));
-    } else {
-      const sampleData: BloodItem[] = [
-        { id: "1", bloodGroup: "A+", quantity: 15, expiryDate: "2025-11-15" },
-        { id: "2", bloodGroup: "A-", quantity: 8, expiryDate: "2025-10-20" },
-        { id: "3", bloodGroup: "B+", quantity: 12, expiryDate: "2025-10-08" },
-        { id: "4", bloodGroup: "B-", quantity: 5, expiryDate: "2025-11-01" },
-        { id: "5", bloodGroup: "AB+", quantity: 7, expiryDate: "2025-10-25" },
-        { id: "6", bloodGroup: "AB-", quantity: 4, expiryDate: "2025-10-09" },
-        { id: "7", bloodGroup: "O+", quantity: 20, expiryDate: "2025-11-10" },
-        { id: "8", bloodGroup: "O-", quantity: 10, expiryDate: "2025-10-30" },
-      ];
-      setBloodStock(sampleData);
-      localStorage.setItem("bloodStock", JSON.stringify(sampleData));
-    }
+    loadStock();
   }, []);
 
-  const getDaysUntilExpiry = (expiryDate: string) => {
-    const today = new Date();
-    const expiry = new Date(expiryDate);
-    const diffTime = expiry.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const loadStock = async () => {
+    try {
+      const stockData = await apiService.getAllStock();
+      setBloodStock(stockData);
+    } catch (error) {
+      console.error("Failed to load stock:", error);
+      toast.error("Failed to load blood stock");
+    }
   };
 
-  const getStatus = (expiryDate: string) => {
-    const days = getDaysUntilExpiry(expiryDate);
-    if (days < 0) return "expired";
-    if (days <= 7) return "expiring";
-    return "available";
+  const handleDiscardExpired = async () => {
+    if (!confirm("Are you sure you want to discard all expired blood? This action cannot be undone.")) {
+      return;
+    }
+
+    setIsDiscarding(true);
+    try {
+      const response = await apiService.discardExpiredStock();
+      toast.success(response || "Expired blood discarded successfully");
+      await loadStock();
+    } catch (error) {
+      console.error("Failed to discard expired stock:", error);
+      toast.error("Failed to discard expired blood");
+    } finally {
+      setIsDiscarding(false);
+    }
   };
+
+  const handleDiscardById = async (id: number, bloodGroup: string) => {
+    if (!confirm(`Are you sure you want to discard ${bloodGroup} blood? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await apiService.discardStockById(id);
+      toast.success(`${bloodGroup} blood discarded successfully`);
+      await loadStock();
+    } catch (error) {
+      console.error("Failed to discard stock:", error);
+      toast.error("Failed to discard blood");
+    }
+  };
+
+
 
   const filteredStock = bloodStock.filter((item) => {
     const matchesSearch = item.bloodGroup.toLowerCase().includes(searchTerm.toLowerCase());
-    const status = getStatus(item.expiryDate);
+    const status = getExpiryStatus(item.expiryDate);
     const matchesFilter = filterStatus === "all" || status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -71,6 +91,9 @@ const BloodStock = () => {
   const totalUnits = bloodStock.reduce((sum, item) => sum + item.quantity, 0);
   const expiringUnits = bloodStock
     .filter((item) => getStatus(item.expiryDate) === "expiring")
+    .reduce((sum, item) => sum + item.quantity, 0);
+  const expiredUnits = bloodStock
+    .filter((item) => getStatus(item.expiryDate) === "expired")
     .reduce((sum, item) => sum + item.quantity, 0);
   const availableTypes = bloodStock.filter(item => item.quantity > 0).length;
 
@@ -85,10 +108,21 @@ const BloodStock = () => {
           <p className="text-muted-foreground">Monitor and manage blood stock levels</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={loadStock}>
             <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
+          {expiredUnits > 0 && (
+            <Button 
+              variant="destructive" 
+              className="gap-2"
+              onClick={handleDiscardExpired}
+              disabled={isDiscarding}
+            >
+              <Trash2 className="w-4 h-4" />
+              {isDiscarding ? "Discarding..." : `Discard Expired (${expiredUnits})`}
+            </Button>
+          )}
           <Button className="gap-2 bg-gradient-to-r from-primary to-info">
             <Download className="w-4 h-4" />
             Export Report
@@ -206,12 +240,13 @@ const BloodStock = () => {
                   <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Expiry Date</th>
                   <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Days Remaining</th>
                   <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Status</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredStock.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-12">
+                    <td colSpan={6} className="text-center py-12">
                       <div className="flex flex-col items-center gap-3">
                         <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
                           <Package className="w-8 h-8 text-muted-foreground" />
@@ -285,6 +320,19 @@ const BloodStock = () => {
                               <TrendingUp className="w-3 h-3" />
                               Available
                             </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6">
+                          {status === "expired" && item.quantity > 0 && (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDiscardById(item.id, item.bloodGroup)}
+                              className="gap-2"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Discard
+                            </Button>
                           )}
                         </td>
                       </tr>

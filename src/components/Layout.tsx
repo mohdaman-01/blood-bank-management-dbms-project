@@ -54,16 +54,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       });
       setExpiringStock(expiring);
     } catch (error) {
-      // Fallback to localStorage
-      const savedStock = localStorage.getItem("bloodStock");
-      if (savedStock) {
-        const stockData = JSON.parse(savedStock);
-        const expiring = stockData.filter((item: BloodItem) => {
-          const days = getDaysUntilExpiry(item.expiryDate);
-          return days <= 7 && days >= 0;
-        });
-        setExpiringStock(expiring);
-      }
+      console.error("Failed to load expiring stock:", error);
+      setExpiringStock([]);
     }
   };
 

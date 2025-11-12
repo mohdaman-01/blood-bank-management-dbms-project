@@ -37,23 +37,13 @@ const Home = () => {
           return;
         }
       } catch (error) {
-        console.warn('Failed to load stats from API, using localStorage fallback');
+        console.error('Failed to load stats from API:', error);
+        setStats({
+          totalDonors: 0,
+          availableUnits: 0,
+          expiringUnits: 0,
+        });
       }
-
-      const donors = JSON.parse(localStorage.getItem("donors") || "[]");
-      const bloodStock = JSON.parse(localStorage.getItem("bloodStock") || "[]");
-      
-      const totalUnits = bloodStock.reduce((sum: number, item: any) => sum + item.quantity, 0);
-      const expiring = bloodStock.filter((item: any) => {
-        const daysUntilExpiry = Math.ceil((new Date(item.expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-        return daysUntilExpiry <= 2 && daysUntilExpiry >= 0;
-      }).reduce((sum: number, item: any) => sum + item.quantity, 0);
-
-      setStats({
-        totalDonors: donors.length,
-        availableUnits: user?.role === 'ADMIN' ? totalUnits : 0,
-        expiringUnits: user?.role === 'ADMIN' ? expiring : 0,
-      });
     };
 
     if (user) {

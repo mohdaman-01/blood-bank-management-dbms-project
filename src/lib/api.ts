@@ -152,6 +152,22 @@ class ApiService {
   async getExpiringUnitsCount(days: number = 2) {
     return this.request(`/stock/expiring/count?days=${days}`);
   }
+
+  async getExpiredStock() {
+    return this.request('/stock/expired');
+  }
+
+  async discardExpiredStock() {
+    return this.request('/stock/discard-expired', {
+      method: 'POST',
+    });
+  }
+
+  async discardStockById(id: number) {
+    return this.request(`/stock/${id}/discard`, {
+      method: 'POST',
+    });
+  }
 }
 
 export const apiService = new ApiService();
