@@ -56,6 +56,11 @@ const Admin = () => {
   const [editingStock, setEditingStock] = useState<number | null>(null);
   const [editQuantity, setEditQuantity] = useState<string>("");
 
+  const getAvailableStock = (bloodGroup: string): number => {
+    const stock = bloodStock.find(item => item.bloodGroup === bloodGroup);
+    return stock ? stock.quantity : 0;
+  };
+
   useEffect(() => {
     loadData();
   }, []);
@@ -80,11 +85,18 @@ const Admin = () => {
   const handleApprove = async (id: number) => {
     try {
       await apiService.updateRequestStatus(id, "APPROVED");
-      toast.success("Request approved successfully");
+      toast.success("Request approved successfully! Blood units deducted from stock.");
       await loadData();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to approve request:", error);
-      toast.error("Failed to approve request");
+      const errorMessage = error?.message || "Failed to approve request";
+      if (errorMessage.includes("Insufficient blood stock")) {
+        toast.error("Cannot approve: Insufficient blood stock available");
+      } else if (errorMessage.includes("not found in stock")) {
+        toast.error("Cannot approve: Blood group not available in stock");
+      } else {
+        toast.error("Failed to approve request");
+      }
     }
   };
 
@@ -253,7 +265,8 @@ const Admin = () => {
                   <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Request ID</th>
                   <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Patient Name</th>
                   <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Blood Group</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Units</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Units Requested</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Available</th>
                   <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Hospital</th>
                   <th className="text-left py-4 px-6 text-sm font-semibold text-muted-foreground">Actions</th>
                 </tr>
@@ -261,7 +274,7 @@ const Admin = () => {
               <tbody>
                 {pendingRequests.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-12">
+                    <td colSpan={7} className="text-center py-12">
                       <div className="flex flex-col items-center gap-3">
                         <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
                           <Activity className="w-8 h-8 text-muted-foreground" />
@@ -297,7 +310,23 @@ const Admin = () => {
                         </span>
                       </td>
                       <td className="py-4 px-6">
-                        <span className="font-semibold text-foreground">{request.unitsRequired}</span>
+                        <span className="font-semibold text-foreground">{request.unitsRequired} units</span>
+                      </td>
+                      <td className="py-4 px-6">
+                        {(() => {
+                          const available = getAvailableStock(request.bloodGroup);
+                          const isInsufficient = available < request.unitsRequired;
+                          return (
+                            <span className={`font-semibold ${isInsufficient ? 'text-destructive' : 'text-success'}`}>
+                              {available} units
+                              {isInsufficient && (
+                                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
+                                  Insufficient
+                                </span>
+                              )}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className="py-4 px-6">
                         <span className="text-muted-foreground">{request.hospitalName}</span>
@@ -307,7 +336,8 @@ const Admin = () => {
                           <Button
                             size="sm"
                             onClick={() => handleApprove(request.id)}
-                            className="gap-2 bg-gradient-to-r from-success to-success/80 hover:shadow-lg hover:shadow-success/30"
+                            disabled={getAvailableStock(request.bloodGroup) < request.unitsRequired}
+                            className="gap-2 bg-gradient-to-r from-success to-success/80 hover:shadow-lg hover:shadow-success/30 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <CheckCircle2 className="w-4 h-4" />
                             Approve

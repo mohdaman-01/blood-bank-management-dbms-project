@@ -84,21 +84,20 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   };
   
   const getNavItems = () => {
-    const baseItems = [
-      { path: "/", label: "Dashboard", icon: Home, color: "text-primary" },
-      { path: "/donor", label: "Donors", icon: Users, color: "text-info" },
-      { path: "/request-blood", label: "Request Blood", icon: Heart, color: "text-destructive" },
-    ];
-
     if (user?.role === 'ADMIN') {
       return [
-        ...baseItems,
+        { path: "/", label: "Dashboard", icon: Home, color: "text-primary" },
+        { path: "/donor", label: "Donors", icon: Users, color: "text-info" },
         { path: "/blood-stock", label: "Blood Stock", icon: Droplet, color: "text-success" },
         { path: "/admin", label: "Admin Panel", icon: Shield, color: "text-warning" },
       ];
     }
 
-    return baseItems;
+    return [
+      { path: "/", label: "Dashboard", icon: Home, color: "text-primary" },
+      { path: "/donor", label: "Donors", icon: Users, color: "text-info" },
+      { path: "/request-blood", label: "Request Blood", icon: Heart, color: "text-destructive" },
+    ];
   };
 
   const navItems = getNavItems();
